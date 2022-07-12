@@ -10,8 +10,9 @@ class PhotoVC: UIViewController, UIScrollViewDelegate, UIGestureRecognizerDelega
 
     var selectedImage: Int = 0
     var images = [UIImage]()
+    var sourceURL: String = ""
     
-    fileprivate let scrollView: UIScrollView = {
+    private let scrollView: UIScrollView = {
         let sv = UIScrollView()
         sv.contentMode = .scaleAspectFit
         sv.showsVerticalScrollIndicator = false
@@ -22,7 +23,7 @@ class PhotoVC: UIViewController, UIScrollViewDelegate, UIGestureRecognizerDelega
         return sv
     }()
     
-    fileprivate let img: UIImageView = {
+    private let img: UIImageView = {
        let iv = UIImageView()
         iv.contentMode = .scaleAspectFit
         iv.clipsToBounds = true
@@ -30,14 +31,14 @@ class PhotoVC: UIViewController, UIScrollViewDelegate, UIGestureRecognizerDelega
         return iv
     }()
     
-    fileprivate let countlbl: UILabel = {
+    private let countlbl: UILabel = {
        let lbl = UILabel()
         lbl.textColor = .white
         lbl.textAlignment = .center
         return lbl
     }()
     
-    fileprivate let closeBtn: UIButton = {
+    private let closeBtn: UIButton = {
         let button = UIButton(type: .custom)
         let image = UIImage(named: "close")?.withRenderingMode(.alwaysTemplate)
         button.setImage(image, for: .normal)
@@ -46,9 +47,23 @@ class PhotoVC: UIViewController, UIScrollViewDelegate, UIGestureRecognizerDelega
         button.addTarget(self, action: #selector(closeBtnTapped), for: .touchUpInside)
         return button
     }()
+
+    private let sourceBtn: UIButton = {
+        let btn = UIButton(type: .custom)
+        let image = UIImage(named: "globe")?.withRenderingMode(.alwaysTemplate)
+        btn.setImage(image, for: .normal)
+        btn.tintColor = .white
+        btn.addTarget(self, action: #selector(openWebView), for: .touchUpInside)
+        return btn
+    }()
     
     @objc func closeBtnTapped(){
         self.dismissView()
+    }
+    
+    @objc func openWebView() {
+        pushView(viewController: WebViewVC())
+        WebViewVC().loadRequest(urlString: sourceURL)
     }
     
     override func viewDidLoad() {
@@ -88,14 +103,12 @@ class PhotoVC: UIViewController, UIScrollViewDelegate, UIGestureRecognizerDelega
         scrollView.addGestureRecognizer(leftSwipe)
     }
 
-    
-    
-    
     func setupView(){
         view.addSubview(scrollView)
         scrollView.addSubview(img)
         view.addSubview(countlbl)
         view.addSubview(closeBtn)
+        view.addSubview(sourceBtn)
     }
     
     func setupconstraint(){
@@ -103,6 +116,7 @@ class PhotoVC: UIViewController, UIScrollViewDelegate, UIGestureRecognizerDelega
         img.frame = scrollView.bounds
 
         countlbl.frame = CGRect(x: 20, y: view.frame.height - 50, width: view.frame.width - 40, height: 21)
+        sourceBtn.frame = CGRect(x: 20, y: view.frame.height - 100, width: 25, height: 25)
         closeBtn.frame = CGRect(x: 20, y: (self.navigationController?.navigationBar.frame.size.height)!, width: 25, height: 25)
     }
     
@@ -115,9 +129,11 @@ class PhotoVC: UIViewController, UIScrollViewDelegate, UIGestureRecognizerDelega
         if closeBtn.isHidden {
             closeBtn.isHidden = false
             countlbl.isHidden = false
+            sourceBtn.isHidden = false
         }else{
             closeBtn.isHidden = true
             countlbl.isHidden = true
+            sourceBtn.isHidden = true
         }
     }
     
@@ -126,10 +142,12 @@ class PhotoVC: UIViewController, UIScrollViewDelegate, UIGestureRecognizerDelega
             scrollView.zoom(to: zoomRectForScale(scale: scrollView.maximumZoomScale, center: recognizer.location(in: recognizer.view)), animated: true)
             closeBtn.isHidden = true
             countlbl.isHidden = true
+            sourceBtn.isHidden = true
         } else {
             scrollView.setZoomScale(1, animated: true)
             closeBtn.isHidden = false
             countlbl.isHidden = false
+            sourceBtn.isHidden = false
         }
     }
     

@@ -16,9 +16,10 @@
 		DE51F0D12876DCEF00EE1EF6 /* LoadingReusableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE51F0D02876DCEF00EE1EF6 /* LoadingReusableView.swift */; };
 		DE5DFC30286DB98300B154F7 /* CollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE5DFC2F286DB98300B154F7 /* CollectionViewCell.swift */; };
 		DE5DFC32286DB99700B154F7 /* PhotoVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE5DFC31286DB99700B154F7 /* PhotoVC.swift */; };
-		DE5DFC34286DB9C200B154F7 /* LoadImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE5DFC33286DB9C200B154F7 /* LoadImage.swift */; };
+		DE5DFC34286DB9C200B154F7 /* NetworkService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE5DFC33286DB9C200B154F7 /* NetworkService.swift */; };
 		DE99B027287547DB00EF642D /* ImagesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE99B026287547DB00EF642D /* ImagesModel.swift */; };
 		DEE57E68287CCAB500F51A9E /* UIKit + Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEE57E67287CCAB500F51A9E /* UIKit + Extension.swift */; };
+		DEE57E6C287D870900F51A9E /* WebViewVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEE57E6B287D870900F51A9E /* WebViewVC.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -33,9 +34,10 @@
 		DE51F0D02876DCEF00EE1EF6 /* LoadingReusableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingReusableView.swift; sourceTree = "<group>"; };
 		DE5DFC2F286DB98300B154F7 /* CollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionViewCell.swift; sourceTree = "<group>"; };
 		DE5DFC31286DB99700B154F7 /* PhotoVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoVC.swift; sourceTree = "<group>"; };
-		DE5DFC33286DB9C200B154F7 /* LoadImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadImage.swift; sourceTree = "<group>"; };
+		DE5DFC33286DB9C200B154F7 /* NetworkService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkService.swift; sourceTree = "<group>"; };
 		DE99B026287547DB00EF642D /* ImagesModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagesModel.swift; sourceTree = "<group>"; };
 		DEE57E67287CCAB500F51A9E /* UIKit + Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIKit + Extension.swift"; sourceTree = "<group>"; };
+		DEE57E6B287D870900F51A9E /* WebViewVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewVC.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -68,12 +70,12 @@
 		DE069D7E286D84C800BADE4D /* iOS_Test_Task */ = {
 			isa = PBXGroup;
 			children = (
+				DEE57E69287D70DA00F51A9E /* Helpers */,
 				DE5DFC38286DB9F000B154F7 /* Resources */,
-				DE5DFC37286DB9EA00B154F7 /* Models */,
+				DEE57E6A287D711C00F51A9E /* Service */,
 				DE5DFC36286DB9E400B154F7 /* Views */,
 				DE5DFC35286DB9CD00B154F7 /* Controllers */,
 				DE069D8D286D84CB00BADE4D /* Info.plist */,
-				DEE57E67287CCAB500F51A9E /* UIKit + Extension.swift */,
 			);
 			path = iOS_Test_Task;
 			sourceTree = "<group>";
@@ -83,6 +85,7 @@
 			children = (
 				DE069D83286D84C800BADE4D /* ViewController.swift */,
 				DE5DFC31286DB99700B154F7 /* PhotoVC.swift */,
+				DEE57E6B287D870900F51A9E /* WebViewVC.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -103,7 +106,6 @@
 			isa = PBXGroup;
 			children = (
 				DE99B026287547DB00EF642D /* ImagesModel.swift */,
-				DE5DFC33286DB9C200B154F7 /* LoadImage.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -115,6 +117,23 @@
 				DE069D81286D84C800BADE4D /* SceneDelegate.swift */,
 			);
 			path = Resources;
+			sourceTree = "<group>";
+		};
+		DEE57E69287D70DA00F51A9E /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				DEE57E67287CCAB500F51A9E /* UIKit + Extension.swift */,
+			);
+			path = Helpers;
+			sourceTree = "<group>";
+		};
+		DEE57E6A287D711C00F51A9E /* Service */ = {
+			isa = PBXGroup;
+			children = (
+				DE5DFC33286DB9C200B154F7 /* NetworkService.swift */,
+				DE5DFC37286DB9EA00B154F7 /* Models */,
+			);
+			path = Service;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -190,9 +209,10 @@
 			files = (
 				DE51F0D12876DCEF00EE1EF6 /* LoadingReusableView.swift in Sources */,
 				DE5DFC30286DB98300B154F7 /* CollectionViewCell.swift in Sources */,
+				DEE57E6C287D870900F51A9E /* WebViewVC.swift in Sources */,
 				DE069D84286D84C800BADE4D /* ViewController.swift in Sources */,
 				DE99B027287547DB00EF642D /* ImagesModel.swift in Sources */,
-				DE5DFC34286DB9C200B154F7 /* LoadImage.swift in Sources */,
+				DE5DFC34286DB9C200B154F7 /* NetworkService.swift in Sources */,
 				DEE57E68287CCAB500F51A9E /* UIKit + Extension.swift in Sources */,
 				DE069D80286D84C800BADE4D /* AppDelegate.swift in Sources */,
 				DE069D82286D84C800BADE4D /* SceneDelegate.swift in Sources */,

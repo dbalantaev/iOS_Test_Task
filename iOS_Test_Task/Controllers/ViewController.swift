@@ -7,18 +7,19 @@
 
 import UIKit
 
+
+
 final class ViewController: UIViewController {
+    
+    var imagesResults: [ImagesResult] = []
+    
+    var images = [UIImage]()
     
 //    var loadingView: LoadingReusableView?
     
 //    var images = LoadedImage()
 
 //    var isLoading = false
-    
-    var imagesResults: [ImagesResult] = []
-    
-    var images = [UIImage]()
-
     
     private let searchBar = UISearchBar()
     
@@ -83,7 +84,7 @@ final class ViewController: UIViewController {
     
     func fetchPhotos(query: String) {
         
-        let apiKey = "e0ad4be925e58c57030f8f0d4683f9f4096eebf8951c4b8716f6e9a63ccf9539"
+        let apiKey = "82247a1f4c90bd2a9b0f546c2d276b684b1dc5d9ef7f5ec956e919b93d1d8fbd"
         let numberOfPages = 3
         let urlStrings = Array(0..<numberOfPages).map { "https://serpapi.com/search.json?q=\(query)&tbm=isch&ijn=\($0)&api_key=\(apiKey)"
         }
@@ -98,23 +99,20 @@ final class ViewController: UIViewController {
                     let jsonResult = try JSONDecoder().decode(ImagesModel.self, from: data)
                     DispatchQueue.main.async {
                         self.imagesResults += jsonResult.imagesResults
-                        self.collectionView.reloadData()
                         self.loadImage(array: self.imagesResults)
+                        self.collectionView.reloadData()
                     }
                 } catch {
                     print(error)
                 }
             }.resume()
-            
-            
         }
-        
     }
     
     func loadImage(array: [ImagesResult]) {
         for elem in array {
             
-            guard let url = URL(string: elem.original) else { return }
+            guard let url = URL(string: elem.thumbnail) else { return }
             
             URLSession.shared.dataTask(with: url) { [weak self] data, _, error in
                 guard let data = data, error == nil else { return }
@@ -122,7 +120,6 @@ final class ViewController: UIViewController {
                 DispatchQueue.main.async {
                     if let image = UIImage(data: data) {
                         self?.images.append(image)
-                        print("searching...")
                     }
                 }
             }.resume()
@@ -130,105 +127,105 @@ final class ViewController: UIViewController {
     }
     
 }
+
+// MARK: - extension for collection view
+
+extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        images.count
+    }
     
-    // MARK: - extension for collection view
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as? CollectionViewCell else { return UICollectionViewCell() }
+        cell.imageView.image = images[indexPath.row]
+        return cell
+    }
     
-    extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
-        func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-            images.count
-        }
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let vc = PhotoVC()
+        vc.selectedImage = indexPath.row
+        vc.images = images
+        vc.sourceURL = imagesResults[indexPath.row].original
         
-        func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as? CollectionViewCell else { return UICollectionViewCell() }
-            cell.imageView.image = images[indexPath.row]
-            return cell
-        }
-        
-        func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-            let vc = PhotoVC()
-            vc.selectedImage = indexPath.row
-            
-            vc.images = images
-            
-            pushView(viewController: vc)
-        }
-        
-        
-        func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-            let width: CGFloat = collectionView.frame.width/2  - 1
-            
-            return CGSize(width: width, height: width)
-        }
-        
+        pushView(viewController: vc)
     }
     
     
-    // MARK: - extension for search bar
-    
-    extension ViewController: UISearchBarDelegate {
-        func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-            searchBar.resignFirstResponder()
-            if let text = searchBar.text?.replacingOccurrences(of: " ", with: "%20") {
-                imagesResults = []
-                collectionView.reloadData()
-                fetchPhotos(query: text)
-            }
-        }
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let width: CGFloat = collectionView.frame.width/2  - 1
+        
+        return CGSize(width: width, height: width)
     }
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    //    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-    //        if indexPath.row == imagesResults.count - 20, !self.isLoading {
-    //            loadMoreData()
-    //        }
-    //    }
-    //
-    //    func loadMoreData() {
-    //        if !self.isLoading {
-    //            self.isLoading = true
-    //            let start = imagesResults.count
-    //            let end = start + 20
-    //
-    //            DispatchQueue.global().asyncAfter(deadline: .now() + .seconds(1)) {
-    //                for _ in start...end {
-    ////                    self.imagesResults += self.imagesResults
-    //                }
-    //                DispatchQueue.main.async {
-    //                    self.collectionView.reloadData()
-    //                    self.isLoading = false
-    //                }
-    //            }
-    //        }
-    //    }
-    
-    
-    //    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForFooterInSection section: Int) -> CGSize {
-    //        if self.isLoading {
-    //            return CGSize.zero
-    //        } else {
-    //            return CGSize(width: collectionView.bounds.size.width, height: 55)
-    //        }
-    //    }
-    
-    
-    //    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-    //        if kind == UICollectionView.elementKindSectionFooter {
-    //            let aFooterView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "spinner", for: indexPath) as! LoadingReusableView
-    //            loadingView = aFooterView
-    //            loadingView?.backgroundColor = UIColor.clear
-    //            return aFooterView
-    //        }
-    //        return UICollectionReusableView()
+}
+
+
+// MARK: - extension for search bar
+
+extension ViewController: UISearchBarDelegate {
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.resignFirstResponder()
+        if let text = searchBar.text?.replacingOccurrences(of: " ", with: "%20") {
+            imagesResults = []
+            fetchPhotos(query: text)
+            collectionView.reloadData()
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+//    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+//        if indexPath.row == imagesResults.count - 20, !self.isLoading {
+//            loadMoreData()
+//        }
+//    }
+//
+//    func loadMoreData() {
+//        if !self.isLoading {
+//            self.isLoading = true
+//            let start = imagesResults.count
+//            let end = start + 20
+//
+//            DispatchQueue.global().asyncAfter(deadline: .now() + .seconds(1)) {
+//                for _ in start...end {
+////                    self.imagesResults += self.imagesResults
+//                }
+//                DispatchQueue.main.async {
+//                    self.collectionView.reloadData()
+//                    self.isLoading = false
+//                }
+//            }
+//        }
+//    }
+
+
+//    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForFooterInSection section: Int) -> CGSize {
+//        if self.isLoading {
+//            return CGSize.zero
+//        } else {
+//            return CGSize(width: collectionView.bounds.size.width, height: 55)
+//        }
+//    }
+
+
+//    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+//        if kind == UICollectionView.elementKindSectionFooter {
+//            let aFooterView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "spinner", for: indexPath) as! LoadingReusableView
+//            loadingView = aFooterView
+//            loadingView?.backgroundColor = UIColor.clear
+//            return aFooterView
+//        }
+//        return UICollectionReusableView()
 //    }
 //
 //    func collectionView(_ collectionView: UICollectionView, willDisplaySupplementaryView view: UICollectionReusableView, forElementKind elementKind: String, at indexPath: IndexPath) {
