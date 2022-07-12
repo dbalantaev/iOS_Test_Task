@@ -18,6 +18,7 @@
 		DE5DFC32286DB99700B154F7 /* PhotoVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE5DFC31286DB99700B154F7 /* PhotoVC.swift */; };
 		DE5DFC34286DB9C200B154F7 /* LoadImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE5DFC33286DB9C200B154F7 /* LoadImage.swift */; };
 		DE99B027287547DB00EF642D /* ImagesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE99B026287547DB00EF642D /* ImagesModel.swift */; };
+		DEE57E68287CCAB500F51A9E /* UIKit + Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEE57E67287CCAB500F51A9E /* UIKit + Extension.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,6 +35,7 @@
 		DE5DFC31286DB99700B154F7 /* PhotoVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoVC.swift; sourceTree = "<group>"; };
 		DE5DFC33286DB9C200B154F7 /* LoadImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadImage.swift; sourceTree = "<group>"; };
 		DE99B026287547DB00EF642D /* ImagesModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagesModel.swift; sourceTree = "<group>"; };
+		DEE57E67287CCAB500F51A9E /* UIKit + Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIKit + Extension.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -71,6 +73,7 @@
 				DE5DFC36286DB9E400B154F7 /* Views */,
 				DE5DFC35286DB9CD00B154F7 /* Controllers */,
 				DE069D8D286D84CB00BADE4D /* Info.plist */,
+				DEE57E67287CCAB500F51A9E /* UIKit + Extension.swift */,
 			);
 			path = iOS_Test_Task;
 			sourceTree = "<group>";
@@ -190,6 +193,7 @@
 				DE069D84286D84C800BADE4D /* ViewController.swift in Sources */,
 				DE99B027287547DB00EF642D /* ImagesModel.swift in Sources */,
 				DE5DFC34286DB9C200B154F7 /* LoadImage.swift in Sources */,
+				DEE57E68287CCAB500F51A9E /* UIKit + Extension.swift in Sources */,
 				DE069D80286D84C800BADE4D /* AppDelegate.swift in Sources */,
 				DE069D82286D84C800BADE4D /* SceneDelegate.swift in Sources */,
 				DE5DFC32286DB99700B154F7 /* PhotoVC.swift in Sources */,

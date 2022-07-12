@@ -9,8 +9,8 @@ import UIKit
 
 class CollectionViewCell: UICollectionViewCell {
     
-    let imageView: LoadImage! = {
-        let image = LoadImage()
+    let imageView: UIImageView! = {
+        let image = UIImageView()
         image.translatesAutoresizingMaskIntoConstraints = false
         image.contentMode = .scaleAspectFill
         image.clipsToBounds = true
@@ -30,6 +30,7 @@ class CollectionViewCell: UICollectionViewCell {
         imageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor).isActive = true
         imageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor).isActive = true
     }
+    
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
