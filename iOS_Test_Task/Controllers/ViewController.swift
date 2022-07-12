@@ -145,7 +145,7 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
         let vc = PhotoVC()
         vc.selectedImage = indexPath.row
         vc.images = images
-        vc.sourceURL = imagesResults[indexPath.row].original
+        vc.sourceURL = imagesResults[indexPath.row].link
         
         pushView(viewController: vc)
     }
