@@ -125,6 +125,16 @@ class PhotoVC: UIViewController, UIScrollViewDelegate, UIGestureRecognizerDelega
         countlbl.text = String(format: "%ld / %ld", selectedImage + 1, images.count)
     }
     
+//    func showLoadingProcess() {
+//        activityIndicator.startAnimating()
+//        img.isHidden = true 
+//    }
+//
+//    func hideLoadingProcess() {
+//        activityIndicator.stopAnimating()
+//        collectionView.isHidden = false
+//    }
+    
     @objc func handleSingleTapOnScrollView(recognizer: UITapGestureRecognizer){
         if closeBtn.isHidden {
             closeBtn.isHidden = false

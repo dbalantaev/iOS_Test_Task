@@ -37,6 +37,13 @@ final class ViewController: UIViewController {
         return cv
     }()
     
+    private let activityIndicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView()
+        indicator.style = .medium
+        indicator.translatesAutoresizingMaskIntoConstraints = false
+        return indicator
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.dismissKeyboard()
@@ -45,6 +52,7 @@ final class ViewController: UIViewController {
         searchBar.delegate = self
         searchBar.backgroundColor = .systemBackground
         view.addSubview(collectionView)
+        view.addSubview(activityIndicator)
         collectionView.delegate = self
         collectionView.dataSource = self
         setupConstraints()
@@ -68,9 +76,28 @@ final class ViewController: UIViewController {
                 collectionView.topAnchor.constraint(equalTo: searchBar.bottomAnchor),
                 collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
                 collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-                collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+                collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+                
+                activityIndicator.topAnchor.constraint(equalTo: view.topAnchor),
+                activityIndicator.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+                activityIndicator.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+                activityIndicator.bottomAnchor.constraint(equalTo: view.bottomAnchor)
             ]
         )
+    }
+    
+    private func showLoadingProcess() {
+        activityIndicator.startAnimating()
+        collectionView.isHidden = true
+    }
+    
+    func didRecieveSearchResult() {
+        collectionView.reloadData()
+    }
+    
+    func hideLoadingProcess() {
+        activityIndicator.stopAnimating()
+        collectionView.isHidden = false
     }
     
 //    func loadData() {
@@ -100,7 +127,6 @@ final class ViewController: UIViewController {
                     DispatchQueue.main.async {
                         self.imagesResults += jsonResult.imagesResults
                         self.loadImage(array: self.imagesResults)
-                        self.collectionView.reloadData()
                     }
                 } catch {
                     print(error)
@@ -120,6 +146,8 @@ final class ViewController: UIViewController {
                 DispatchQueue.main.async {
                     if let image = UIImage(data: data) {
                         self?.images.append(image)
+                        self?.hideLoadingProcess()
+                        self?.collectionView.reloadData()
                     }
                 }
             }.resume()
@@ -146,7 +174,6 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
         vc.selectedImage = indexPath.row
         vc.images = images
         vc.sourceURL = imagesResults[indexPath.row].link
-        
         pushView(viewController: vc)
     }
     
@@ -169,17 +196,10 @@ extension ViewController: UISearchBarDelegate {
             imagesResults = []
             fetchPhotos(query: text)
             collectionView.reloadData()
+            showLoadingProcess()
         }
     }
 }
-
-
-
-
-
-
-
-
 
 
 
