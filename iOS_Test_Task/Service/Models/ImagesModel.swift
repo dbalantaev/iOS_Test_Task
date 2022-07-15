@@ -34,15 +34,3 @@ struct ImagesResult: Codable {
 //        case inStock = "in_stock"
     }
 }
-
-// MARK: - SuggestedSearch
-//struct SuggestedSearch: Codable {
-//    let name, link, chips, serpapiLink: String
-//    let thumbnail: String
-
-//    enum CodingKeys: String, CodingKey {
-//        case name, link, chips
-//        case serpapiLink = "serpapi_link"
-//        case thumbnail
-//    }
-//}
