@@ -10,44 +10,54 @@ import WebKit
 
 class WebViewVC: UIViewController {
     
-    let webView = WKWebView()
+    var sourceURL = String()
+    
+    private let webView: WKWebView = {
+        let webView = WKWebView()
+        webView.translatesAutoresizingMaskIntoConstraints = false
+        return webView
+    }()
+    
+    private let closeBtn: UIButton = {
+        let button = UIButton(type: .custom)
+        let image = UIImage(named: "close")?.withRenderingMode(.alwaysTemplate)
+        button.setImage(image, for: .normal)
+        button.tintColor = .black
+        button.addTarget(self, action: #selector(closeBtnTapped), for: .touchUpInside)
+        return button
+    }()
+    
+    @objc func closeBtnTapped(){
+        self.dismissView()
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        navigationController?.hidesBarsOnTap = true
         view.addSubview(webView)
-        
+        view.addSubview(closeBtn)
         setupConstraints()
+        loadRequest()
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        self.navigationController?.setNavigationBarHidden(false, animated: animated)
-    }
-    
-    override var prefersStatusBarHidden: Bool {
-        return navigationController?.isNavigationBarHidden == true
-    }
-
-    override var preferredStatusBarUpdateAnimation: UIStatusBarAnimation {
-        return UIStatusBarAnimation.slide
-    }
-    
-    func setupConstraints() {
-        webView.translatesAutoresizingMaskIntoConstraints = false
+    private func setupConstraints() {
+        closeBtn.frame = CGRect(x: 20, y: 80, width: 25, height: 25)
+        
         NSLayoutConstraint.activate([
+            webView.topAnchor.constraint(equalTo: view.topAnchor),
             webView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             webView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            webView.topAnchor.constraint(equalTo: view.topAnchor),
             webView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
     }
     
-    func loadRequest(urlString: String) {
+    func loadRequest() {
         
-        guard let url = URL(string: urlString) else { return }
+        let url = sourceURL
+        
+        guard let url = URL(string: url) else { return }
         let urlRequest = URLRequest(url: url)
         
         webView.load(urlRequest)
     }
+    
 }

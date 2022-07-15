@@ -14,6 +14,7 @@ class CollectionViewCell: UICollectionViewCell {
         image.translatesAutoresizingMaskIntoConstraints = false
         image.contentMode = .scaleAspectFill
         image.clipsToBounds = true
+        image.layer.cornerRadius = 10
         return image
     }()
     

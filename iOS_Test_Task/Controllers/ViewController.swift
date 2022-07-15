@@ -7,31 +7,37 @@
 
 import UIKit
 
-
-
-final class ViewController: UIViewController {
+class ViewController: UIViewController {
+    
+//    var loadingView: LoadingReusableView?
+//
+//    var isLoading = false
     
     var imagesResults: [ImagesResult] = []
     
     var images = [UIImage]()
     
-//    var loadingView: LoadingReusableView?
+    var networkService = NetworkService()
     
-//    var images = LoadedImage()
-
-//    var isLoading = false
+    private var image: UIImage? {
+        didSet {
+            images.append(image!)
+            hideLoadingProcess()
+            didRecieveSearchResult()
+        }
+    }
     
-    private let searchBar = UISearchBar()
+    private let searchController = UISearchController()
     
-    let collectionView: UICollectionView = {
+    private let collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
-        layout.minimumLineSpacing = 1
-        layout.minimumInteritemSpacing = 1
+        layout.minimumLineSpacing = 8
+        layout.minimumInteritemSpacing = 4
         
         let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
         cv.register(CollectionViewCell.self, forCellWithReuseIdentifier: "cell")
-        cv.register(LoadingReusableView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter, withReuseIdentifier: "spinner")
-        
+//        cv.register(LoadingReusableView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter, withReuseIdentifier: "spinner")
+//
         cv.translatesAutoresizingMaskIntoConstraints = false
         cv.backgroundColor = .systemBackground
         return cv
@@ -41,6 +47,7 @@ final class ViewController: UIViewController {
         let indicator = UIActivityIndicatorView()
         indicator.style = .medium
         indicator.translatesAutoresizingMaskIntoConstraints = false
+        indicator.backgroundColor = .systemBackground
         return indicator
     }()
     
@@ -48,15 +55,14 @@ final class ViewController: UIViewController {
         super.viewDidLoad()
         self.dismissKeyboard()
         self.title = "Photos"
-        view.addSubview(searchBar)
-        searchBar.delegate = self
-        searchBar.backgroundColor = .systemBackground
+        view.backgroundColor = .systemBackground
+        navigationItem.searchController = searchController
+        searchController.searchBar.delegate = self
         view.addSubview(collectionView)
         view.addSubview(activityIndicator)
         collectionView.delegate = self
         collectionView.dataSource = self
         setupConstraints()
-//        loadData()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -67,23 +73,19 @@ final class ViewController: UIViewController {
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        searchBar.frame = CGRect(x: 10, y: view.safeAreaInsets.top, width: view.frame.size.width-20, height: 50)
+        collectionView.frame = CGRect(x: 10, y: 0, width: view.frame.size.width-20, height: view.frame.size.height)
     }
     
     func setupConstraints() {
         NSLayoutConstraint.activate(
             [
-                collectionView.topAnchor.constraint(equalTo: searchBar.bottomAnchor),
-                collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-                collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-                collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-                
                 activityIndicator.topAnchor.constraint(equalTo: view.topAnchor),
                 activityIndicator.leadingAnchor.constraint(equalTo: view.leadingAnchor),
                 activityIndicator.trailingAnchor.constraint(equalTo: view.trailingAnchor),
                 activityIndicator.bottomAnchor.constraint(equalTo: view.bottomAnchor)
             ]
         )
+        
     }
     
     private func showLoadingProcess() {
@@ -91,23 +93,14 @@ final class ViewController: UIViewController {
         collectionView.isHidden = true
     }
     
-    func didRecieveSearchResult() {
+    private func didRecieveSearchResult() {
         collectionView.reloadData()
     }
     
-    func hideLoadingProcess() {
+    private func hideLoadingProcess() {
         activityIndicator.stopAnimating()
         collectionView.isHidden = false
     }
-    
-//    func loadData() {
-//        isLoading = false
-//        collectionView.collectionViewLayout.invalidateLayout()
-//        for _ in 0...20 {
-//            imagesArray += imagesResults
-//        }
-//        self.collectionView.reloadData()
-//    }
     
     func fetchPhotos(query: String) {
         
@@ -121,12 +114,13 @@ final class ViewController: UIViewController {
                 guard let self = self,
                       let data = data,
                       error == nil else { return }
-                
                 do {
                     let jsonResult = try JSONDecoder().decode(ImagesModel.self, from: data)
                     DispatchQueue.main.async {
                         self.imagesResults += jsonResult.imagesResults
-                        self.loadImage(array: self.imagesResults)
+                        self.networkService.loadImage(array: self.imagesResults) { image in
+                            self.image = image
+                        }
                     }
                 } catch {
                     print(error)
@@ -135,28 +129,9 @@ final class ViewController: UIViewController {
         }
     }
     
-    func loadImage(array: [ImagesResult]) {
-        for elem in array {
-            
-            guard let url = URL(string: elem.thumbnail) else { return }
-            
-            URLSession.shared.dataTask(with: url) { [weak self] data, _, error in
-                guard let data = data, error == nil else { return }
-                
-                DispatchQueue.main.async {
-                    if let image = UIImage(data: data) {
-                        self?.images.append(image)
-                        self?.hideLoadingProcess()
-                        self?.collectionView.reloadData()
-                    }
-                }
-            }.resume()
-        }
-    }
-    
 }
 
-// MARK: - extension for collection view
+// MARK: - extension Collection View
 
 extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -177,58 +152,35 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
         pushView(viewController: vc)
     }
     
-    
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let width: CGFloat = collectionView.frame.width/2  - 1
+        let width: CGFloat = collectionView.frame.width/2 - 4
         
         return CGSize(width: width, height: width)
     }
     
-}
-
-
-// MARK: - extension for search bar
-
-extension ViewController: UISearchBarDelegate {
-    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        searchBar.resignFirstResponder()
-        if let text = searchBar.text?.replacingOccurrences(of: " ", with: "%20") {
-            imagesResults = []
-            fetchPhotos(query: text)
-            collectionView.reloadData()
-            showLoadingProcess()
-        }
-    }
-}
-
-
-
+    // MARK: Пагинация (не работает, тк API не позволяет ее сделать (там просто нет для нее параметров))
 
 //    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-//        if indexPath.row == imagesResults.count - 20, !self.isLoading {
+//        if indexPath.row == images.count - 20, !self.isLoading {
 //            loadMoreData()
 //        }
 //    }
 //
 //    func loadMoreData() {
-//        if !self.isLoading {
-//            self.isLoading = true
-//            let start = imagesResults.count
-//            let end = start + 20
+//            if !self.isLoading {
+//                self.isLoading = true
+//                DispatchQueue.global().asyncAfter(deadline: .now() + .seconds(1)) { // Remove the 1-second delay if you want to load the data without waiting
+//                    // Download more data here
 //
-//            DispatchQueue.global().asyncAfter(deadline: .now() + .seconds(1)) {
-//                for _ in start...end {
-////                    self.imagesResults += self.imagesResults
-//                }
-//                DispatchQueue.main.async {
-//                    self.collectionView.reloadData()
-//                    self.isLoading = false
+//
+//                    DispatchQueue.main.async {
+//                        self.didRecieveSearchResult()
+//                        self.isLoading = false
+//                    }
 //                }
 //            }
 //        }
-//    }
-
-
+//
 //    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForFooterInSection section: Int) -> CGSize {
 //        if self.isLoading {
 //            return CGSize.zero
@@ -236,8 +188,8 @@ extension ViewController: UISearchBarDelegate {
 //            return CGSize(width: collectionView.bounds.size.width, height: 55)
 //        }
 //    }
-
-
+//
+//
 //    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
 //        if kind == UICollectionView.elementKindSectionFooter {
 //            let aFooterView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "spinner", for: indexPath) as! LoadingReusableView
@@ -259,3 +211,21 @@ extension ViewController: UISearchBarDelegate {
 //            self.loadingView?.activityIndicator.stopAnimating()
 //        }
 //    }
+
+}
+
+
+// MARK: - extension for search bar
+
+extension ViewController: UISearchBarDelegate {
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.resignFirstResponder()
+        if let text = searchBar.text?.replacingOccurrences(of: " ", with: "%20") {
+            imagesResults = []
+            images = []
+            fetchPhotos(query: text)
+            didRecieveSearchResult()
+            showLoadingProcess()
+        }
+    }
+}

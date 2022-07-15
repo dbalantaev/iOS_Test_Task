@@ -6,11 +6,14 @@
 //
 
 import UIKit
-class PhotoVC: UIViewController, UIScrollViewDelegate, UIGestureRecognizerDelegate {
 
-    var selectedImage: Int = 0
+class PhotoVC: UIViewController {
+    
     var images = [UIImage]()
-    var sourceURL: String = ""
+    
+    var sourceURL = String()
+    
+    var selectedImage: Int = 0
     
     private let scrollView: UIScrollView = {
         let sv = UIScrollView()
@@ -43,7 +46,6 @@ class PhotoVC: UIViewController, UIScrollViewDelegate, UIGestureRecognizerDelega
         let image = UIImage(named: "close")?.withRenderingMode(.alwaysTemplate)
         button.setImage(image, for: .normal)
         button.tintColor = .white
-        
         button.addTarget(self, action: #selector(closeBtnTapped), for: .touchUpInside)
         return button
     }()
@@ -62,14 +64,14 @@ class PhotoVC: UIViewController, UIScrollViewDelegate, UIGestureRecognizerDelega
     }
     
     @objc func openWebView() {
-        pushView(viewController: WebViewVC())
-        WebViewVC().loadRequest(urlString: sourceURL)
+        let vc = WebViewVC()
+        vc.sourceURL = sourceURL
+        pushView(viewController: vc)
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .black
-        
         scrollView.delegate = self
         
         setupGesture()
@@ -77,10 +79,38 @@ class PhotoVC: UIViewController, UIScrollViewDelegate, UIGestureRecognizerDelega
         setupconstraint()
         loadImage()
     }
-   
+    
     override func viewWillAppear(_ animated: Bool) {
         self.navigationController?.navigationBar.isHidden = true
     }
+    
+    func setupView(){
+        view.addSubview(scrollView)
+        scrollView.addSubview(img)
+        view.addSubview(countlbl)
+        view.addSubview(closeBtn)
+        view.addSubview(sourceBtn)
+    }
+    
+    func setupconstraint(){
+        scrollView.frame = view.bounds
+        img.frame = scrollView.bounds
+
+        countlbl.frame = CGRect(x: 20, y: view.frame.height - 50, width: view.frame.width - 40, height: 21)
+        sourceBtn.frame = CGRect(x: 20, y: view.frame.height - 100, width: 25, height: 25)
+        closeBtn.frame = CGRect(x: 20, y: 80, width: 25, height: 25)
+    }
+    
+    func loadImage(){
+        img.image = images[selectedImage]
+        countlbl.text = String(format: "%ld / %ld", selectedImage + 1, images.count)
+    }
+    
+}
+
+// MARK: -  скроллинг и увеличение двойным нажатием
+
+extension PhotoVC: UIScrollViewDelegate, UIGestureRecognizerDelegate  {
     
     func setupGesture(){
         let singleTapGesture = UITapGestureRecognizer(target: self, action: #selector(handleSingleTapOnScrollView(recognizer:)))
@@ -102,45 +132,13 @@ class PhotoVC: UIViewController, UIScrollViewDelegate, UIGestureRecognizerDelega
         scrollView.addGestureRecognizer(rightSwipe)
         scrollView.addGestureRecognizer(leftSwipe)
     }
-
-    func setupView(){
-        view.addSubview(scrollView)
-        scrollView.addSubview(img)
-        view.addSubview(countlbl)
-        view.addSubview(closeBtn)
-        view.addSubview(sourceBtn)
-    }
-    
-    func setupconstraint(){
-        scrollView.frame = view.bounds
-        img.frame = scrollView.bounds
-
-        countlbl.frame = CGRect(x: 20, y: view.frame.height - 50, width: view.frame.width - 40, height: 21)
-        sourceBtn.frame = CGRect(x: 20, y: view.frame.height - 100, width: 25, height: 25)
-        closeBtn.frame = CGRect(x: 20, y: (self.navigationController?.navigationBar.frame.size.height)!, width: 25, height: 25)
-    }
-    
-    func loadImage(){
-        img.image = images[selectedImage]
-        countlbl.text = String(format: "%ld / %ld", selectedImage + 1, images.count)
-    }
-    
-//    func showLoadingProcess() {
-//        activityIndicator.startAnimating()
-//        img.isHidden = true 
-//    }
-//
-//    func hideLoadingProcess() {
-//        activityIndicator.stopAnimating()
-//        collectionView.isHidden = false
-//    }
     
     @objc func handleSingleTapOnScrollView(recognizer: UITapGestureRecognizer){
         if closeBtn.isHidden {
             closeBtn.isHidden = false
             countlbl.isHidden = false
             sourceBtn.isHidden = false
-        }else{
+        } else {
             closeBtn.isHidden = true
             countlbl.isHidden = true
             sourceBtn.isHidden = true
@@ -184,15 +182,14 @@ class PhotoVC: UIViewController, UIScrollViewDelegate, UIGestureRecognizerDelega
             
         case UISwipeGestureRecognizer.Direction.left:
             self.selectedImage += 1
-        
+            
         default:
             break
         }
         self.selectedImage = (self.selectedImage < 0) ? (self.images.count - 1):
-            self.selectedImage % self.images.count
+        self.selectedImage % self.images.count
         
         loadImage()
-        
     }
     
     @objc func handlePinch(recognizer: UIPinchGestureRecognizer){
@@ -201,7 +198,6 @@ class PhotoVC: UIViewController, UIScrollViewDelegate, UIGestureRecognizerDelega
         recognizer.scale = 1
         img.contentMode = .scaleAspectFit
     }
-    
     
     func scrollViewDidZoom(_ scrollView: UIScrollView) {
         if scrollView.zoomScale > 1 {
@@ -215,7 +211,7 @@ class PhotoVC: UIViewController, UIScrollViewDelegate, UIGestureRecognizerDelega
                 
                 let left = 0.5 * (newWidth * scrollView.zoomScale > img.frame.width ? (newWidth - img.frame.width) : (scrollView.frame.width - scrollView.contentSize.width))
                 let top = 0.5 * (newHeight * scrollView.zoomScale > img.frame.height ? (newHeight - img.frame.height) : (scrollView.frame.height - scrollView.contentSize.height))
-
+                
                 scrollView.contentInset = UIEdgeInsets(top: top, left: left, bottom: top, right: left)
             }
         } else {

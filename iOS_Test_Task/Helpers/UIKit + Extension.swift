@@ -8,6 +8,8 @@ import UIKit
 
 extension UIViewController {
     
+    // MARK: скрытие клавиатуры по нажатю на любое место и открытие/закрытие экранов
+    
     func dismissKeyboard() {
         let tap: UITapGestureRecognizer = UITapGestureRecognizer( target:self, action:    #selector(UIViewController.dismissKeyboardTouchOutside))
         tap.cancelsTouchesInView = false
@@ -25,7 +27,6 @@ extension UIViewController {
         self.view.window!.layer.add(transition, forKey: kCATransition)
         navigationController?.pushViewController(viewController, animated: true)
     }
-    
     
     func dismissView() {
         let transition = CATransition()

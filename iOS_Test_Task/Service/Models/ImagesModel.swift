@@ -20,7 +20,7 @@ struct ImagesModel: Codable {
 
 // MARK: - ImagesResult
 struct ImagesResult: Codable {
-    let position: Int
+//    let position: Int
     let thumbnail, original, title: String
     let link: String
     let source: String
@@ -28,7 +28,7 @@ struct ImagesResult: Codable {
 //    let inStock: Bool
 
     enum CodingKeys: String, CodingKey {
-        case position = "position"
+//        case position = "position"
         case thumbnail, original, title, link, source
 //        case isProduct = "is_product"
 //        case inStock = "in_stock"
@@ -36,13 +36,13 @@ struct ImagesResult: Codable {
 }
 
 // MARK: - SuggestedSearch
-struct SuggestedSearch: Codable {
-    let name, link, chips, serpapiLink: String
+//struct SuggestedSearch: Codable {
+//    let name, link, chips, serpapiLink: String
 //    let thumbnail: String
 
-    enum CodingKeys: String, CodingKey {
-        case name, link, chips
-        case serpapiLink = "serpapi_link"
+//    enum CodingKeys: String, CodingKey {
+//        case name, link, chips
+//        case serpapiLink = "serpapi_link"
 //        case thumbnail
-    }
-}
+//    }
+//}
