@@ -6,7 +6,9 @@
 - SwiftLint (CocoaPods)
 - Image Cache
 - Prev/Next image scroll on full size image VC
-- Web View with original source of image
+- Web View with original source of image  
+  
+Please, run pod install in terminal, before run app in Xcode.
 
 ![Снимок экрана 2022-07-16 в 03 59 02](https://user-images.githubusercontent.com/88937180/179316765-984f813a-c7a6-4c74-89a4-adfeb788dd66.png)
 
