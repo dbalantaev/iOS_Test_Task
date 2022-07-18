@@ -1,5 +1,5 @@
 //
-//  ViewController.swift
+//  MainVC.swift
 //  iOS_Test_Task
 //
 //  Created by Дмитрий Балантаев on 30.06.2022.
@@ -7,15 +7,17 @@
 
 import UIKit
 
-final class ViewController: UIViewController {
+final class MainVC: UIViewController {
+
     var imagesResults: [ImagesResult] = []
     var images = [UIImage]()
     var networkService = NetworkService()
+
     private var imageURL: [ImagesResult]? {
         didSet {
             self.imagesResults = imageURL!
-            self.networkService.loadImage(array: self.imagesResults) { image in
-                self.image = image
+            self.networkService.loadImage(array: self.imagesResults) { [weak self] image in
+                self?.image = image
             }
         }
     }
@@ -26,7 +28,9 @@ final class ViewController: UIViewController {
             didRecieveSearchResult()
         }
     }
+
     private let searchController = UISearchController()
+
     private let collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.minimumLineSpacing = 8
@@ -44,6 +48,7 @@ final class ViewController: UIViewController {
         indicator.backgroundColor = .systemBackground
         return indicator
     }()
+
     override func viewDidLoad() {
         super.viewDidLoad()
         self.dismissKeyboard()
@@ -57,16 +62,19 @@ final class ViewController: UIViewController {
         collectionView.dataSource = self
         setupConstraints()
     }
+
     override func viewWillAppear(_ animated: Bool) {
         self.navigationController?.navigationBar.isHidden = false
         self.navigationController?.hidesBarsOnTap = false
         self.navigationController?.navigationBar.prefersLargeTitles = true
     }
+
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         collectionView.frame = CGRect(x: 10, y: 0, width: view.frame.size.width-20, height: view.frame.size.height)
     }
-    func setupConstraints() {
+
+    private func setupConstraints() {
         NSLayoutConstraint.activate(
             [
                 activityIndicator.topAnchor.constraint(equalTo: view.topAnchor),
@@ -76,24 +84,31 @@ final class ViewController: UIViewController {
             ]
         )
     }
+
     private func showLoadingProcess() {
         activityIndicator.startAnimating()
         collectionView.isHidden = true
     }
+
     private func didRecieveSearchResult() {
         collectionView.reloadData()
     }
+
     private func hideLoadingProcess() {
         activityIndicator.stopAnimating()
         collectionView.isHidden = false
     }
+
 }
 // MARK: - extension Collection View
-extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+
+extension MainVC: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+
     func collectionView(_ collectionView: UICollectionView,
                         numberOfItemsInSection section: Int) -> Int {
         images.count
     }
+
     func collectionView(_ collectionView: UICollectionView,
                         cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell",
@@ -102,6 +117,7 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
         cell.imageView.image = images[indexPath.row]
         return cell
     }
+
     func collectionView(_ collectionView: UICollectionView,
                         didSelectItemAt indexPath: IndexPath) {
         let photoVC = PhotoVC()
@@ -110,25 +126,30 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
         photoVC.sourceURL = imagesResults[indexPath.row].link
         pushView(viewController: photoVC)
     }
+
     func collectionView(_ collectionView: UICollectionView,
                         layout collectionViewLayout: UICollectionViewLayout,
                         sizeForItemAt indexPath: IndexPath) -> CGSize {
         let width: CGFloat = collectionView.frame.width/2 - 4
         return CGSize(width: width, height: width)
     }
+
 }
 // MARK: - extension for search bar
-extension ViewController: UISearchBarDelegate {
+
+extension MainVC: UISearchBarDelegate {
+
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         searchBar.resignFirstResponder()
         if let text = searchBar.text?.replacingOccurrences(of: " ", with: "%20") {
             imagesResults = []
             images = []
-            networkService.fetchPhotos(query: text) { jsonResult in
-                self.imageURL = jsonResult
+            networkService.fetchPhotos(query: text) { [weak self] jsonResult in
+                self?.imageURL = jsonResult
             }
             didRecieveSearchResult()
             showLoadingProcess()
         }
     }
+
 }

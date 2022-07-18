@@ -9,12 +9,15 @@ import UIKit
 import WebKit
 
 final class WebViewVC: UIViewController {
+
     var sourceURL = String()
+
     private let webView: WKWebView = {
         let webView = WKWebView()
         webView.translatesAutoresizingMaskIntoConstraints = false
         return webView
     }()
+
     private lazy var closeBtn: UIButton = {
         let button = UIButton(type: .custom)
         let image = UIImage(named: "close")?.withRenderingMode(.alwaysTemplate)
@@ -23,9 +26,11 @@ final class WebViewVC: UIViewController {
         button.addTarget(self, action: #selector(closeBtnTapped), for: .touchUpInside)
         return button
     }()
+
     @objc func closeBtnTapped () {
         self.dismissView()
     }
+
     override func viewDidLoad() {
         super.viewDidLoad()
         view.addSubview(webView)
@@ -33,6 +38,7 @@ final class WebViewVC: UIViewController {
         setupConstraints()
         loadRequest()
     }
+
     private func setupConstraints() {
         closeBtn.frame = CGRect(x: 20, y: 80, width: 25, height: 25)
         NSLayoutConstraint.activate([
@@ -42,10 +48,12 @@ final class WebViewVC: UIViewController {
             webView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
     }
-    func loadRequest() {
+
+    private func loadRequest() {
         let url = sourceURL
         guard let url = URL(string: url) else { return }
         let urlRequest = URLRequest(url: url)
         webView.load(urlRequest)
     }
+
 }

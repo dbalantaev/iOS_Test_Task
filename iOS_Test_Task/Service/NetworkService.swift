@@ -8,7 +8,9 @@
 import UIKit
 
 final class NetworkService {
+
     var imageCache = NSCache<AnyObject, AnyObject>()
+
     func fetchPhotos(query: String, completion: @escaping ([ImagesResult]) -> Void) {
         let apiKey = "20886cf384c56470133e96619b70e1e2e01d1cb11e929d7ee1069defe1e43438"
         let numberOfPages = 3
@@ -30,6 +32,7 @@ final class NetworkService {
             }.resume()
         }
     }
+
     func loadImage(array: [ImagesResult], completion: @escaping (UIImage?) -> Void) {
         for elem in array {
             if let imageFromCache = imageCache.object(forKey: elem.thumbnail as AnyObject) as? UIImage {
@@ -48,4 +51,5 @@ final class NetworkService {
             }
         }
     }
+
 }

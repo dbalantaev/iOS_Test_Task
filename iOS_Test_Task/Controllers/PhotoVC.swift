@@ -8,9 +8,11 @@
 import UIKit
 
 final class PhotoVC: UIViewController {
+
     var images = [UIImage]()
     var sourceURL = String()
     var selectedImage: Int = 0
+
     private let scrollView: UIScrollView = {
         let scroll = UIScrollView()
         scroll.contentMode = .scaleAspectFit
@@ -42,6 +44,11 @@ final class PhotoVC: UIViewController {
         button.addTarget(self, action: #selector(closeBtnTapped), for: .touchUpInside)
         return button
     }()
+
+    @objc func closeBtnTapped() {
+        self.dismissView()
+    }
+
     private lazy var sourceBtn: UIButton = {
         let btn = UIButton(type: .custom)
         let image = UIImage(named: "globe")?.withRenderingMode(.alwaysTemplate)
@@ -50,14 +57,13 @@ final class PhotoVC: UIViewController {
         btn.addTarget(self, action: #selector(openWebView), for: .touchUpInside)
         return btn
     }()
-    @objc func closeBtnTapped() {
-        self.dismissView()
-    }
+
     @objc func openWebView() {
         let webView = WebViewVC()
         webView.sourceURL = sourceURL
         pushView(viewController: webView)
     }
+
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .black
@@ -70,14 +76,16 @@ final class PhotoVC: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         self.navigationController?.navigationBar.isHidden = true
     }
-    func setupView() {
+
+    private func setupView() {
         view.addSubview(scrollView)
         scrollView.addSubview(imageView)
         view.addSubview(countlbl)
         view.addSubview(closeBtn)
         view.addSubview(sourceBtn)
     }
-    func setupconstraint() {
+
+    private func setupconstraint() {
         scrollView.frame = view.bounds
         imageView.frame = scrollView.bounds
         countlbl.frame = CGRect(x: 20,
@@ -93,16 +101,19 @@ final class PhotoVC: UIViewController {
                                 width: 25,
                                 height: 25)
     }
+
     func loadImage() {
         imageView.image = images[selectedImage]
         countlbl.text = String(format: "%ld / %ld",
                                selectedImage + 1,
                                images.count)
     }
+
 }
 
 // MARK: - скроллинг и увеличение двойным нажатием
 extension PhotoVC: UIScrollViewDelegate, UIGestureRecognizerDelegate {
+
     func setupGesture() {
         let singleTapGesture = UITapGestureRecognizer(target: self,
                                                       action:
@@ -126,6 +137,9 @@ extension PhotoVC: UIScrollViewDelegate, UIGestureRecognizerDelegate {
         scrollView.addGestureRecognizer(rightSwipe)
         scrollView.addGestureRecognizer(leftSwipe)
     }
+
+    // MARK: - это тоже по хорошему переписать по компактнее
+
     @objc func handleSingleTapOnScrollView (recognizer: UITapGestureRecognizer) {
         if closeBtn.isHidden {
             closeBtn.isHidden = false
@@ -137,6 +151,7 @@ extension PhotoVC: UIScrollViewDelegate, UIGestureRecognizerDelegate {
             sourceBtn.isHidden = true
         }
     }
+
     @objc func handleDoubleTapOnScrollView (recognizer: UITapGestureRecognizer) {
         if scrollView.zoomScale == 1 {
             scrollView.zoom(to: zoomRectForScale(scale: scrollView.maximumZoomScale,
@@ -152,17 +167,7 @@ extension PhotoVC: UIScrollViewDelegate, UIGestureRecognizerDelegate {
             sourceBtn.isHidden = false
         }
     }
-    func zoomRectForScale(scale: CGFloat, center: CGPoint) -> CGRect {
-        var zoomRect = CGRect.zero
-        zoomRect.size.height = imageView.frame.size.height / scale
-        zoomRect.size.width  = imageView.frame.size.width  / scale
-        let newCenter = imageView.convert(center, from: scrollView)
-        zoomRect.origin.x = newCenter.x - (zoomRect.size.width / 2.0)
-        zoomRect.origin.y = newCenter.y - (zoomRect.size.height / 2.0)
-        return zoomRect
-    }
-    func viewForZooming(in scrollView: UIScrollView) -> UIView? {
-        return imageView }
+
     @objc func handleSwipeFrom(recognizer: UISwipeGestureRecognizer) {
         let direction: UISwipeGestureRecognizer.Direction = recognizer.direction
         switch direction {
@@ -177,12 +182,30 @@ extension PhotoVC: UIScrollViewDelegate, UIGestureRecognizerDelegate {
         self.selectedImage % self.images.count
         loadImage()
     }
+
     @objc func handlePinch(recognizer: UIPinchGestureRecognizer) {
         print(recognizer)
         recognizer.view?.transform = (recognizer.view?.transform.scaledBy(x: recognizer.scale, y: recognizer.scale))!
         recognizer.scale = 1
         imageView.contentMode = .scaleAspectFit
     }
+
+    func zoomRectForScale(scale: CGFloat, center: CGPoint) -> CGRect {
+        var zoomRect = CGRect.zero
+        zoomRect.size.height = imageView.frame.size.height / scale
+        zoomRect.size.width  = imageView.frame.size.width  / scale
+        let newCenter = imageView.convert(center, from: scrollView)
+        zoomRect.origin.x = newCenter.x - (zoomRect.size.width / 2.0)
+        zoomRect.origin.y = newCenter.y - (zoomRect.size.height / 2.0)
+        return zoomRect
+    }
+
+    func viewForZooming(in scrollView: UIScrollView) -> UIView? {
+        return imageView
+    }
+
+    // MARK: - переписать этот ужас через guard (кода будет в 3 раза меньше)
+
     func scrollViewDidZoom(_ scrollView: UIScrollView) {
         if scrollView.zoomScale > 1 {
             if let image = imageView.image {
@@ -203,4 +226,5 @@ extension PhotoVC: UIScrollViewDelegate, UIGestureRecognizerDelegate {
             scrollView.contentInset = UIEdgeInsets.zero
         }
     }
+
 }
